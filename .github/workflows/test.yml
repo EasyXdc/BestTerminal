@@ -1,0 +1,27 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-14
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax
+        run: |
+          for file in install.sh uninstall.sh doctor.sh scripts/*.sh tests/*.sh; do
+            /bin/bash -n "$file"
+          done
+      - name: Run integration scenarios
+        run: /bin/bash tests/test-install.sh
+      - name: Run ShellCheck
+        run: |
+          brew install shellcheck
+          shellcheck install.sh uninstall.sh doctor.sh scripts/*.sh tests/*.sh
